@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var index_1 = require("../index");
 var grpc = require("grpc");
 var streams = require("./generated/streams_pb");
 var Appends = /** @class */ (function () {
@@ -23,12 +24,28 @@ var Appends = /** @class */ (function () {
         });
         var appendRequestOptions = new streams.AppendReq.Options();
         appendRequestOptions.setStreamName(streamName);
-        appendRequestOptions.setAny(new streams.AppendReq.Empty());
-        appendRequestOptions.clearRevision();
+        console.log(typeof expectedRevision + ':' + expectedRevision);
+        if (typeof expectedRevision === "number") {
+            appendRequestOptions.setRevision(expectedRevision);
+        }
+        else {
+            if (expectedRevision === index_1.AnyStreamRevision.Any) {
+                appendRequestOptions.setAny(new streams.AppendReq.Empty);
+            }
+            else if (expectedRevision == index_1.AnyStreamRevision.NoStream) {
+                appendRequestOptions.setNoStream(new streams.AppendReq.Empty);
+            }
+            else if (expectedRevision === index_1.AnyStreamRevision.StreamExists) {
+                appendRequestOptions.setStreamExists(new streams.AppendReq.Empty);
+            }
+            appendRequestOptions.clearRevision();
+        }
         var header = new streams.AppendReq();
         header.setOptions(appendRequestOptions);
         // CONSIDER LOGGING LEVELS
         appendCall.write(header);
+        // TODO: Check concurrency
+        // TODO: Make sure sensible error is returned from concurrency problems
         eventData.forEach(function (value) {
             var id = new streams.UUID();
             id.setString(value.eventId);

@@ -63,7 +63,6 @@ export class Position {
         this.commitPosition = commitPosition;
         this.preparePosition = preparePosition;
     }
-
     isEnd() {
         return this.commitPosition == Number.MAX_VALUE && this.preparePosition === Number.MAX_VALUE;
     }
@@ -74,8 +73,22 @@ export class Position {
 }
 
 export class Filter {
-
+    // static ExcludeSystemEvents = new Filter(FilterContext.EventType, FilterType.Regex, ['^[^\$].*']);
+    //
+    // private constructor(eventType: FilterContext, regex: FilterType.Regex, data: string[]) {
+    //
+    // }
 }
+
+// export enum FilterContext { 
+//     EventType = (),
+//     StreamName
+// }
+//
+// export enum FilterType {
+//     Regex,
+//     Prefix
+// }
 
 export interface UserCredentials {
     username: string;
@@ -107,7 +120,7 @@ export class EventData {
 }
 
 export enum AnyStreamRevision {
-    NoStream = 1,
-    Any = 2,
-    StreamExists = 3
+    NoStream = '1',
+    Any = '2',
+    StreamExists = '3'
 }

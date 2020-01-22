@@ -49,7 +49,7 @@ export declare class EventData {
     constructor(eventId: string, type: string, data: Uint8Array, metaData?: Uint8Array, isJson?: boolean);
 }
 export declare enum AnyStreamRevision {
-    NoStream = 1,
-    Any = 2,
-    StreamExists = 3
+    NoStream = "1",
+    Any = "2",
+    StreamExists = "3"
 }

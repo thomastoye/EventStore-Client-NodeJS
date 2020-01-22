@@ -4,11 +4,9 @@ import * as grpc from "grpc";
 import * as streams from "./generated/streams_pb";
 
 export class Appends {
-    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: number, eventData: Array<types.EventData>, userCredentials: types.UserCredentials): void;
-    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: types.AnyStreamRevision, eventData: Array<types.EventData>, userCredentials: types.UserCredentials): void;
-    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: number, eventData: Array<types.EventData>): void;
-    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: types.AnyStreamRevision, eventData: Array<types.EventData>): void;
-    
+    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: number, eventData: Array<types.EventData>, userCredentials?: types.UserCredentials): void;
+    appendToStream(this: EventStoreConnection, streamName: string, expectedRevision: types.AnyStreamRevision, eventData: Array<types.EventData>, userCredentials?: types.UserCredentials): void;
+   
     appendToStream(
         this: EventStoreConnection,
         streamName: string,
@@ -24,8 +22,6 @@ export class Appends {
             password = userCredentials.password;
         }
         
-       
-
         let metadata = new grpc.Metadata();
         let auth = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
         metadata.set("authorization", auth);
@@ -41,6 +37,7 @@ export class Appends {
         let appendRequestOptions = new streams.AppendReq.Options();
         appendRequestOptions.setStreamName(streamName);
 
+        console.log(typeof expectedRevision + ':' + expectedRevision);
         if (typeof expectedRevision === "number") {
             appendRequestOptions.setRevision(expectedRevision);
         } else {

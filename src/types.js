@@ -86,7 +86,7 @@ var EventData = /** @class */ (function () {
 exports.EventData = EventData;
 var AnyStreamRevision;
 (function (AnyStreamRevision) {
-    AnyStreamRevision[AnyStreamRevision["NoStream"] = 1] = "NoStream";
-    AnyStreamRevision[AnyStreamRevision["Any"] = 2] = "Any";
-    AnyStreamRevision[AnyStreamRevision["StreamExists"] = 3] = "StreamExists";
+    AnyStreamRevision["NoStream"] = "1";
+    AnyStreamRevision["Any"] = "2";
+    AnyStreamRevision["StreamExists"] = "3";
 })(AnyStreamRevision = exports.AnyStreamRevision || (exports.AnyStreamRevision = {}));

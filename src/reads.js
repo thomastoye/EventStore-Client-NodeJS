@@ -3,13 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var types = require("./types");
 var grpc = require("grpc");
 var streams = require("./generated/streams_pb");
-var streams_pb_1 = require("./generated/streams_pb");
 var Reads = /** @class */ (function () {
     function Reads() {
     }
     Reads.prototype.readAllForwards = function (position, maxCount, resolveLinksTo, filter, userCredentials) {
         // TODO: Needs to handle filter
         // TODO: Override user credentials
+        if (resolveLinksTo === void 0) { resolveLinksTo = false; }
         var metadata = new grpc.Metadata();
         var auth = 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64');
         metadata.set("authorization", auth);
@@ -30,7 +30,7 @@ var Reads = /** @class */ (function () {
             allOptions.setPosition(reqPosition);
         }
         var uuidOption = new streams.ReadReq.Options.UUIDOption();
-        uuidOption.setString(new streams_pb_1.ReadReq.Empty);
+        uuidOption.setString(new streams.ReadReq.Empty);
         readRequestOptions.setUuidOption(uuidOption);
         // TODO: User Agent
         readRequestOptions.setAll(allOptions);

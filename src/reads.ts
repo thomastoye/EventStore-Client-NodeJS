@@ -2,18 +2,17 @@ import {EventStoreConnection} from "../index";
 import * as types from "./types";
 import * as grpc from "grpc";
 import * as streams from "./generated/streams_pb";
-import {ReadReq} from "./generated/streams_pb";
-import {ReadResp} from "./generated/streams_pb";
 
 export class Reads {
+
     readAllForwards(
         this: EventStoreConnection,
         position: types.Position,
         maxCount: number,
-        resolveLinksTo: boolean,
-        filter: types.Filter,
-        userCredentials?: types.UserCredentials
-    ): Promise<types.ResolvedEvent[]> {
+        resolveLinksTo: boolean = false,
+        filter?: types.Filter,
+        userCredentials?: types.UserCredentials): 
+        Promise<types.ResolvedEvent[]> {
         // TODO: Needs to handle filter
         // TODO: Override user credentials
 
@@ -23,6 +22,7 @@ export class Reads {
 
         let readRequestOptions = new streams.ReadReq.Options();
 
+        
         readRequestOptions.setReadDirection(streams.ReadReq.Options.ReadDirection.FORWARDS);
         readRequestOptions.setResolveLinks(resolveLinksTo);
 
@@ -40,7 +40,7 @@ export class Reads {
         }
 
         let uuidOption = new streams.ReadReq.Options.UUIDOption();
-        uuidOption.setString(new ReadReq.Empty);
+        uuidOption.setString(new streams.ReadReq.Empty);
         readRequestOptions.setUuidOption(uuidOption);
 
         // TODO: User Agent
@@ -79,7 +79,7 @@ export class Reads {
         });
     }
 
-    static convertToEventRecord(event: ReadResp.ReadEvent.RecordedEvent | undefined): types.EventRecord | null {
+    static convertToEventRecord(event: streams.ReadResp.ReadEvent.RecordedEvent | undefined): types.EventRecord | null {
         if (event === undefined) {
             return null;
         }
