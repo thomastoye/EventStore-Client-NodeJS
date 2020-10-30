@@ -1,4 +1,5 @@
 import * as dns from "dns";
+import { promisify } from "util";
 import { ChannelCredentials } from "@grpc/grpc-js";
 
 import { MemberInfo as GrpcMemberInfo } from "../../generated/gossip_pb";
@@ -10,6 +11,8 @@ import { EndPoint, MemberInfo, NodePreference } from "../types";
 import { RANDOM } from "../constants";
 import { ClusterSettings } from ".";
 import { debug } from "../utils/debug";
+
+const resolveDns = promisify(dns.resolve);
 
 export async function discoverEndpoint(
   settings: ClusterSettings,
@@ -46,21 +49,56 @@ export async function discoverEndpoint(
   }
 }
 
-function resolveDomainName(domain: string): Promise<EndPoint[]> {
-  debug.connection(`Resolving domain name ${domain}`);
+const resolveDomainName = async (
+  domain: string | EndPoint
+): Promise<EndPoint[]> => {
+  const host: EndPoint =
+    typeof domain === "string" ? { address: domain, port: 2113 } : domain;
 
-  return new Promise((resolve, reject) => {
-    dns.resolveSrv(domain, (error, addresses) => {
-      if (error) return reject(error);
-      return resolve(
-        addresses.map<EndPoint>((record) => ({
-          address: record.name,
-          port: record.port,
-        }))
-      );
-    });
-  });
-}
+  debug.connection(`Resolving domain name ${host.address}`);
+
+  try {
+    debug.connection(`Resolving "A" records`);
+    const records = await resolveA(host);
+    return records;
+  } catch (error) {
+    debug.connection(
+      'Failed to resolve "A" records with error %s',
+      error.toString()
+    );
+  }
+
+  try {
+    debug.connection(`Resolving "SRV" records`);
+    const records = await resolveSRV(host);
+    return records;
+  } catch (error) {
+    debug.connection(
+      'Failed to resolve "SRV" records with error %s',
+      error.toString()
+    );
+  }
+
+  throw new Error("Unable to resolve DNS");
+};
+
+const resolveA = async (host: EndPoint): Promise<EndPoint[]> => {
+  const records = await resolveDns(host.address, "A");
+  if (!records.length) throw new Error('No "A" records returned');
+  return records.map<EndPoint>((record) => ({
+    address: record,
+    port: host.port,
+  }));
+};
+
+const resolveSRV = async (host: EndPoint): Promise<EndPoint[]> => {
+  const records = await resolveDns(host.address, "SRV");
+  if (!records.length) throw new Error('No "SRV" records returned');
+  return records.map<EndPoint>((record) => ({
+    address: record.name,
+    port: record.port,
+  }));
+};
 
 function inAllowedStates(member: MemberInfo): boolean {
   switch (member.state) {

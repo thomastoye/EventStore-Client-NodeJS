@@ -145,7 +145,7 @@ export class EventStoreConnectionBuilder {
    * @param domain
    */
   public dnsClusterConnection(
-    domain: string,
+    domain: string | EndPoint,
     nodePreference?: NodePreference
   ): EventStoreConnection {
     return new EventStoreConnection(
@@ -171,7 +171,7 @@ export class EventStoreConnectionBuilder {
 
 export type ClusterSettings =
   | {
-      domain: string;
+      domain: EndPoint | string;
       nodePreference?: NodePreference;
     }
   | {
